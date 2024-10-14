@@ -3,14 +3,20 @@ package com.rabbiter.hospital.controller;
 import com.rabbiter.hospital.pojo.Checks;
 import com.rabbiter.hospital.service.CheckService;
 import com.rabbiter.hospital.utils.ResponseData;
+import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
 
-@RestController
-@RequestMapping("check")
+/**
+ * @Author dongyanpeng
+ * @Date 2024/10/10 14:08
+ */
+@Controller
+@RequestMapping("select")
 public class CheckController {
     @Autowired
     private CheckService checkService;

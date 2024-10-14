@@ -8,5 +8,44 @@
             p_age BETWEEN #{startAge} AND #{endAge}
     </select>
 
+<!--    更新患者信息-->
+
+    <update id="updatePatient">
+        update patient
+        <set>
+            <if test="pName != null">
+                p_name = #{pName},
+            </if>
+            <if test="pAge != null">
+                p_age = #{pAge},
+            </if>
+            <if test="pSex != null">
+                p_sex = #{pSex},
+            </if>
+            <if test="pPhone != null">
+                p_phone =#{pPhone},
+            </if>
+            <if test="pEmail != null">
+                p_email = #{pEmail},
+            </if>
+            <if test="pCard != null">
+                p_card = #{pCard},
+            </if>
+            <if test="pBirthday != null">
+                p_birthday = #{pBirthday},
+            </if>
+            <if test="pState != null">
+                p_state = #{pState}
+            </if>
+            <if test="pPassword != null">
+                p_password = #{pPassword}
+            </if>
+        </set>
+        <where>
+            <if test="id != null">
+                p_id = #{id}
+            </if>
+        </where>
+    </update>
 
 </mapper>

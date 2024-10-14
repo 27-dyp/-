@@ -32,7 +32,7 @@ public class OrderServiceImpl implements OrderService {
     public HashMap<String, Object> findAllOrders(int pageNumber, int size, String query) {
         Page<Orders> page = new Page<>(pageNumber, size);
         QueryWrapper<Orders> wrapper = new QueryWrapper<>();
-        wrapper.like("p_id", query);
+        wrapper.like("p_name", query);
         IPage<Orders> iPage = this.orderMapper.selectPage(page, wrapper);
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("total", iPage.getTotal());       //总条数
@@ -151,7 +151,7 @@ public class OrderServiceImpl implements OrderService {
     public HashMap<String, Object> findOrderFinish(int pageNumber, int size, String query, int dId){
         Page<Orders> page = new Page<>(pageNumber, size);
         QueryWrapper<Orders> wrapper = new QueryWrapper<>();
-        wrapper.like("p_id", query).eq("d_id", dId).orderByDesc("o_start").eq("o_state", 1);
+        wrapper.like("p_name", query).eq("d_id", dId).orderByDesc("o_start").eq("o_state", 1);
         IPage<Orders> iPage = this.orderMapper.selectPage(page, wrapper);
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("total", iPage.getTotal());       //总条数
@@ -167,7 +167,7 @@ public class OrderServiceImpl implements OrderService {
     public HashMap<String, Object> findOrderByDid(int pageNumber, int size, String query, int dId){
         Page<Orders> page = new Page<>(pageNumber, size);
         QueryWrapper<Orders> wrapper = new QueryWrapper<>();
-        wrapper.like("p_id", query).eq("d_id", dId).orderByDesc("o_start");
+        wrapper.like("p_name", query).eq("d_id", dId).orderByDesc("o_start");
         IPage<Orders> iPage = this.orderMapper.selectPage(page, wrapper);
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("total", iPage.getTotal());       //总条数

@@ -8,6 +8,7 @@ import com.rabbiter.hospital.service.OrderService;
 import com.rabbiter.hospital.service.PatientService;
 import com.rabbiter.hospital.utils.JwtUtil;
 import com.rabbiter.hospital.utils.ResponseData;
+import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -91,8 +92,9 @@ public class AdminController {
      * bug: dState会自动更新为0
      */
     @RequestMapping("modifyDoctor")
-    @ResponseBody
-    public ResponseData modifyDoctor(Doctor doctor) {
+    public ResponseData modifyDoctor(
+            @RequestBody Doctor doctor
+    ) {
         this.doctorService.modifyDoctor(doctor);
         return ResponseData.success("修改医生信息成功");
     }

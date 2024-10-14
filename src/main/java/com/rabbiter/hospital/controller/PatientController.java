@@ -9,6 +9,7 @@ import com.rabbiter.hospital.service.PatientService;
 import com.rabbiter.hospital.utils.JwtUtil;
 import com.rabbiter.hospital.utils.PdfUtil;
 import com.rabbiter.hospital.utils.ResponseData;
+import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import redis.clients.jedis.JedisPool;
@@ -106,4 +107,48 @@ public class PatientController {
         return  ResponseData.success("统计患者男女人数成功", this.patientService.patientAge());
 
     }
+
+    /*
+    * 修改患者信息
+    * */
+    @RequestMapping("updatePatient")
+    public ResponseData updatePatient(
+            @RequestBody Patient patient
+    ){
+        Integer i = this.patientService.updatePatient(patient);
+        if (i>0) {
+            return ResponseData.success("修改信息成功");
+        }
+        return ResponseData.fail("修改信息失败");
+    }
+
+    /*
+     * 比较账号和邮箱
+     * */
+    @RequestMapping("diffAccountEmail")
+    public ResponseData diffAccountEmail(
+            @RequestParam(value = "id") Integer id,
+            @RequestParam(value = "email") String email
+    ) {
+        Boolean result = this.patientService.diffAccountEmail(id, email);
+        if (result){
+            return ResponseData.success("改邮箱账号可用！");
+        }
+        return ResponseData.fail("改邮箱账号未注册或不存在！");
+
+    }
+
+    //更新密码
+    @RequestMapping("updatePassword")
+    public ResponseData updatePassword(
+            @RequestParam(value = "id") Integer id,
+            @RequestParam(value = "newPassword") String newPassword
+    ){
+        Boolean result = this.patientService.updatePassword(id, newPassword);
+        if (result){
+            return ResponseData.success("密码重置成功！");
+        }
+        return ResponseData.fail("密码重置失败！");
+    }
+
 }

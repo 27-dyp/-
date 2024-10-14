@@ -9,9 +9,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Bed {
     @TableId(value = "b_id")
     @JsonProperty("bId")
-    private int bId;
+    private Integer bId;
     @JsonProperty("pId")
-    private int pId;
+    private Integer pId;
     @JsonProperty("pName")
     private String pName;
     @JsonProperty("dId")

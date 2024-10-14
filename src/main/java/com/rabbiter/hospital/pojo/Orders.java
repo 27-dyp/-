@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Orders {
     @TableId(value = "o_id")
     @JsonProperty("oId")
-    private int oId;
+    private Integer oId;
     @JsonProperty("pId")
     private int pId;
     @JsonProperty("dId")

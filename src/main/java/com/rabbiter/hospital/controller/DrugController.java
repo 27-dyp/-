@@ -3,6 +3,7 @@ package com.rabbiter.hospital.controller;
 import com.rabbiter.hospital.pojo.Drug;
 import com.rabbiter.hospital.service.DrugService;
 import com.rabbiter.hospital.utils.ResponseData;
+import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;

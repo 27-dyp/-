@@ -1,142 +1,130 @@
 package com.rabbiter.hospital.utils;
 
-import com.rabbiter.hospital.pojo.Orders;
 import com.itextpdf.text.*;
+import com.itextpdf.text.html.WebColors;
 import com.itextpdf.text.pdf.*;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.pdf.draw.LineSeparator;
+import com.rabbiter.hospital.pojo.Orders;
+
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 public class PdfUtil {
 
     public static void ExportPdf(HttpServletRequest request, HttpServletResponse response, Orders order) throws Exception {
-        //告诉浏览器用什么软件可以打开此文件
         response.setHeader("content-Type", "application/pdf");
-        //下载文件的默认名称
-       // response.setHeader("Content-Disposition", "attachment;filename=XXX.pdf");
-        //设置中文
-        BaseFont bfChinese = BaseFont.createFont("STSong-Light", "UniGB-UCS2-H", BaseFont.NOT_EMBEDDED);
-        Font FontChinese = new Font(bfChinese, 12, Font.NORMAL);
-        //创建一个文档
-        Document document = new Document(PageSize.A4);
-        //创建第一个段落
-        Paragraph titleParagraph = new Paragraph();
-        //支持中文
-        titleParagraph.setFont(new Font(bfChinese, 20, Font.NORMAL));
-        //设置居中显示
-        titleParagraph.setAlignment(Element.ALIGN_CENTER);
-        titleParagraph.add("XX医院病情报告单");
-        //创建第二个段落
-        Paragraph tipsParagraph = new Paragraph();
-        tipsParagraph.setFont(new Font(bfChinese, 10, Font.NORMAL));
-        tipsParagraph.setAlignment(Element.ALIGN_CENTER);
-        tipsParagraph.setLeading(tipsParagraph.getTotalLeading()+10);
-        tipsParagraph.add("打印时间：" + TodayUtil.getTodayYmd());
+        //attachment下载打印， inline预览
+        response.setHeader("Content-Disposition", "inline;filename=病情报告单.pdf");
 
+        // 使用品牌颜色
+        BaseColor brandColor = WebColors.getRGBColor("#0072C6"); // 假设这是医院的品牌颜色
+
+        // 创建字体
+        BaseFont bfChinese = BaseFont.createFont("STSong-Light", "UniGB-UCS2-H", BaseFont.NOT_EMBEDDED);
+        Font titleFont = new Font(bfChinese, 24, Font.BOLD, brandColor);
+        Font subtitleFont = new Font(bfChinese, 16, Font.NORMAL, brandColor);
+        Font contentFont = new Font(bfChinese, 12, Font.NORMAL, BaseColor.BLACK);
+        Font smallContentFont = new Font(bfChinese, 10, Font.NORMAL, BaseColor.BLACK);
+
+        // 创建文档
+        Document document = new Document(PageSize.A4, 50, 50, 50, 50);
         PdfWriter writer = PdfWriter.getInstance(document, response.getOutputStream());
 
-        // 打开文档
         document.open();
-        //设置文档标题
-        document.addTitle("医院");
-        //设置文档作者
-        document.addAuthor("董彦鹏小组");
-        document.addCreationDate();
-        //设置关键字
-        document.addKeywords("iText");
-        document.addLanguage("中文");
-        //增加段落进入文档
+
+        // 添加logo
+        PdfContentByte cb = writer.getDirectContent();
+        Image logo = Image.getInstance("src/main/resources/static/images/logo.png");
+        logo.scaleToFit(100, 100);
+        logo.setAbsolutePosition(480, 760); // 右上角位置
+        cb.addImage(logo);
+
+        // 添加标题
+        Paragraph titleParagraph = new Paragraph("XX医院病情报告单", titleFont);
+        titleParagraph.setAlignment(Element.ALIGN_CENTER);
         document.add(titleParagraph);
+
+        // 添加打印时间
+        Paragraph tipsParagraph = new Paragraph("打印时间：" + TodayUtil.getTodayYmd(), subtitleFont);
+        tipsParagraph.setAlignment(Element.ALIGN_CENTER);
+        tipsParagraph.setSpacingBefore(10);
         document.add(tipsParagraph);
-        //表格
+
+        // 患者信息表格
         PdfPTable tableMessage = new PdfPTable(4);
-        tableMessage.setSpacingBefore(8f);
-        tableMessage.setSpacingAfter(8f);
-        //设置表格无边框
-        tableMessage.getDefaultCell().setBorder(0);
-        //设置表格宽度
-        tableMessage.setTotalWidth(new float[] { 30, 120, 30, 120 });
-        tableMessage.addCell(new Paragraph("姓名", FontChinese));
-        tableMessage.addCell(new Paragraph(order.getPatient().getPName(), FontChinese));
-        tableMessage.addCell(new Paragraph("性别", FontChinese));
-        tableMessage.addCell(new Paragraph(order.getPatient().getPGender(), FontChinese));
-        tableMessage.addCell(new Paragraph("年龄", FontChinese));
-        tableMessage.addCell(new Paragraph(order.getPatient().getPAge() +" 岁", FontChinese));
-        tableMessage.addCell(new Paragraph("单号", FontChinese));
-        tableMessage.addCell(String.valueOf(order.getOId()));
-        tableMessage.addCell(new Paragraph("日期", FontChinese));
-        tableMessage.addCell(order.getOEnd());
-        tableMessage.addCell(new Paragraph("电话", FontChinese));
-        tableMessage.addCell(order.getPatient().getPPhone());
+        tableMessage.setSpacingBefore(20f);
+        tableMessage.setSpacingAfter(10f);
+        tableMessage.setWidths(new float[]{60, 100, 60, 100});
+        tableMessage.getDefaultCell().setBorderWidth(1);
+        tableMessage.getDefaultCell().setBackgroundColor(brandColor);
+        tableMessage.getDefaultCell().setPadding(20);
+
+        addCell(tableMessage, "姓名：", contentFont, Element.ALIGN_CENTER, BaseColor.WHITE);
+        addCell(tableMessage, order.getPatient().getPName(), contentFont, Element.ALIGN_LEFT, BaseColor.WHITE);
+        addCell(tableMessage, "性别：", contentFont, Element.ALIGN_CENTER, BaseColor.WHITE);
+        addCell(tableMessage, order.getPatient().getPGender(), contentFont, Element.ALIGN_LEFT, BaseColor.WHITE);
+
+        addCell(tableMessage, "年龄：", contentFont, Element.ALIGN_CENTER, BaseColor.WHITE);
+        addCell(tableMessage, order.getPatient().getPAge() + " 岁", contentFont, Element.ALIGN_LEFT, BaseColor.WHITE);
+        addCell(tableMessage, "单号：", contentFont, Element.ALIGN_CENTER, BaseColor.WHITE);
+        addCell(tableMessage, String.valueOf(order.getOId()), contentFont, Element.ALIGN_LEFT, BaseColor.WHITE);
+
+        addCell(tableMessage, "诊断日期：", contentFont, Element.ALIGN_CENTER, BaseColor.WHITE);
+        addCell(tableMessage, order.getOEnd(), contentFont, Element.ALIGN_LEFT, BaseColor.WHITE);
+        addCell(tableMessage, "联系电话：", contentFont, Element.ALIGN_CENTER, BaseColor.WHITE);
+        addCell(tableMessage, order.getPatient().getPPhone(), contentFont, Element.ALIGN_LEFT, BaseColor.WHITE);
+
         document.add(tableMessage);
 
-
-
-        //病情表格
+        // 病情表格
         PdfPTable tableOrder = new PdfPTable(1);
-        //设置表格无边框
-        tableOrder.getDefaultCell().setBorder(0);
         tableOrder.setSpacingBefore(30f);
-        tableOrder.setSpacingAfter(10f);
+        tableOrder.setSpacingAfter(20f);
+        tableOrder.getDefaultCell().setBorderWidth(1);
+        tableOrder.getDefaultCell().setBackgroundColor(brandColor);
+        tableOrder.getDefaultCell().setPadding(5);
 
-        PdfPCell cell1 = new PdfPCell(new Paragraph("症状", new Font(bfChinese, 14, Font.NORMAL)));
-        cell1.setFixedHeight(25);
-        cell1.setBorder(0);
-        PdfPCell cell2 = new PdfPCell(new Paragraph(order.getORecord(), new Font(bfChinese, 10, Font.NORMAL)));
-        cell2.setFixedHeight(30);
-        cell2.setBorder(0);
-        cell2.setPaddingLeft(10);
-        PdfPCell cell3 = new PdfPCell(new Paragraph("检查项目及价钱", new Font(bfChinese, 14, Font.NORMAL)));
-        cell3.setFixedHeight(25);
-        cell3.setBorder(0);
-        PdfPCell cell4 = new PdfPCell(new Paragraph(order.getOCheck(), new Font(bfChinese, 10, Font.NORMAL)));
-        cell4.setFixedHeight(30);
-        cell4.setBorder(0);
-        cell4.setPaddingLeft(10);
-        PdfPCell cell5 = new PdfPCell(new Paragraph("药物及价钱", new Font(bfChinese, 14, Font.NORMAL)));
-        cell5.setFixedHeight(25);
-        cell5.setBorder(0);
-        PdfPCell cell6 = new PdfPCell(new Paragraph(order.getODrug(), new Font(bfChinese, 10, Font.NORMAL)));
-        cell6.setFixedHeight(30);
-        cell6.setBorder(0);
-        cell6.setPaddingLeft(10);
-        PdfPCell cell7 = new PdfPCell(new Paragraph("诊断/医生意见", new Font(bfChinese, 14, Font.NORMAL)));
-        cell7.setFixedHeight(25);
-        cell7.setBorder(0);
-        PdfPCell cell8 = new PdfPCell(new Paragraph(order.getOAdvice(), new Font(bfChinese, 10, Font.NORMAL)));
-        cell8.setFixedHeight(100);
-        cell8.setBorder(0);
-        cell8.setPaddingLeft(10);
+        addCell(tableOrder, "症状", subtitleFont, Element.ALIGN_LEFT, BaseColor.WHITE);
+        addCell(tableOrder, order.getORecord(), contentFont, Element.ALIGN_LEFT, BaseColor.WHITE);
 
-        tableOrder.addCell(cell1);
-        tableOrder.addCell(cell2);
-        tableOrder.addCell(cell3);
-        tableOrder.addCell(cell4);
-        tableOrder.addCell(cell5);
-        tableOrder.addCell(cell6);
-        tableOrder.addCell(cell7);
-        tableOrder.addCell(cell8);
+        addCell(tableOrder, "检查项目及价格", subtitleFont, Element.ALIGN_LEFT, BaseColor.WHITE);
+        addCell(tableOrder, order.getOCheck(), contentFont, Element.ALIGN_LEFT, BaseColor.WHITE);
+
+        addCell(tableOrder, "药物及价格", subtitleFont, Element.ALIGN_LEFT, BaseColor.WHITE);
+        addCell(tableOrder, order.getODrug(), contentFont, Element.ALIGN_RIGHT, BaseColor.WHITE);
+
+        addCell(tableOrder, "诊断/医生意见", subtitleFont, Element.ALIGN_LEFT, BaseColor.WHITE);
+        addCell(tableOrder, order.getOAdvice(), contentFont, Element.ALIGN_LEFT, BaseColor.WHITE);
+
         document.add(tableOrder);
 
-        //增加logo，绝对定位居于右上角
-//        Image image = Image.getInstance("src/main/resources/static/images/dgut.jpeg");
-//        image.setAbsolutePosition(440,690);
-//        document.add(image);
+        // 添加分隔线
+        LineSeparator lineSeparator = new LineSeparator();
+        lineSeparator.setLineColor(brandColor);
+        document.add(lineSeparator);
 
-        //设置pdf底部版权说明
-        PdfContentByte cb = writer.getDirectContent();
-        BaseFont bf= BaseFont.createFont("STSong-Light", "UniGB-UCS2-H",BaseFont.EMBEDDED);
+        // 设置底部版权说明
         cb.beginText();
-        cb.setFontAndSize(bf, 11);
-        cb.showTextAligned(PdfContentByte.ALIGN_CENTER,  "该报告单仅供参考", 300, 40, 0);
-        cb.setFontAndSize(bf,13);
-        cb.showTextAligned(PdfContentByte.ALIGN_CENTER,  "版权医院所有", 300, 20, 0);
+        cb.setFontAndSize(bfChinese, 11);
+        cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "该报告单仅供参考", 300, 40, 0);
+        cb.setFontAndSize(bfChinese, 13);
+        cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "版权医院所有", 300, 20, 0);
         cb.endText();
 
-
-
-
-
+        // 关闭文档
         document.close();
+    }
+
+    private static void addCell(PdfPTable table, String text, Font font, int alignment, BaseColor backgroundColor) {
+        PdfPCell cell = new PdfPCell(new Paragraph(text, font));
+        cell.setHorizontalAlignment(alignment);
+        cell.setBackgroundColor(backgroundColor);
+        BaseColor brandColor = WebColors.getRGBColor("#0072C6");
+        cell.setBorderColor(brandColor); // 使用品牌颜色作为边框
+        cell.setPadding(5);
+        table.addCell(cell);
     }
 }

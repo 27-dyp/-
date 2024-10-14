@@ -13,7 +13,8 @@ import com.rabbiter.hospital.mapper.DoctorMapper;
 import com.rabbiter.hospital.pojo.Arrange;
 import com.rabbiter.hospital.pojo.Doctor;
 import com.rabbiter.hospital.service.DoctorService;
-import com.rabbiter.hospital.utils.Md5Util;
+import com.rabbiter.hospital.utils.HashUtil;
+//import com.rabbiter.hospital.utils.Md5Util;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,7 +43,8 @@ public class DoctorServiceImpl implements DoctorService {
     @Override
     public Doctor login(int dId, String dPassword){
         Doctor doctor = this.doctorMapper.selectById(dId);
-        String password = Md5Util.getMD5(dPassword);
+        //String password = Md5Util.getMD5(dPassword);
+        String password = HashUtil.getSHA256(dPassword);
         if (doctor == null) {
             return null;
         } else {
@@ -90,7 +92,8 @@ public class DoctorServiceImpl implements DoctorService {
             }
         }
         //密码加密
-        String password = Md5Util.getMD5(doctor.getdPassword());
+        //String password = Md5Util.getMD5(doctor.getdPassword());
+        String password = HashUtil.getSHA256(doctor.getdPassword());
         doctor.setdPassword(password);
         doctor.setdState(1);
         doctor.setdStar(0.00);
@@ -185,7 +188,8 @@ public class DoctorServiceImpl implements DoctorService {
         params.setHeadRows(1);
        List<Doctor> doctors = ExcelImportUtil.importExcel(multipartFile.getInputStream(), Doctor.class, params);
         for (Doctor doctor: doctors){
-            doctor.setdPassword(Md5Util.getMD5(doctor.getdPassword()));
+//            doctor.setdPassword(Md5Util.getMD5(doctor.getdPassword()));
+            doctor.setdPassword(HashUtil.getSHA256(doctor.getdPassword()));
             this.addDoctor(doctor);
         }
         return true;

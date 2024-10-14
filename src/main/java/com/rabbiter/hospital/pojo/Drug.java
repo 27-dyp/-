@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Drug {
     @TableId(value = "dr_id")
     @JsonProperty("drId")
-    private int drId;
+    private Integer drId;
     @JsonProperty("drName")
     private String drName;
     @JsonProperty("drPrice")
@@ -23,7 +23,7 @@ public class Drug {
     public Drug() {
     }
 
-    public Drug(int drId, String drName, double drPrice, int drNumber, String drUnit, String drPublisher) {
+    public Drug(Integer drId, String drName, double drPrice, Integer drNumber, String drUnit, String drPublisher) {
         this.drId = drId;
         this.drName = drName;
         this.drPrice = drPrice;
@@ -32,11 +32,11 @@ public class Drug {
         this.drPublisher = drPublisher;
     }
 
-    public int getDrId() {
+    public Integer getDrId() {
         return drId;
     }
 
-    public void setDrId(int drId) {
+    public void setDrId(Integer drId) {
         this.drId = drId;
     }
 

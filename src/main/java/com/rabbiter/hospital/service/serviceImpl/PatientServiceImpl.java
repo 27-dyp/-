@@ -4,19 +4,25 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.rabbiter.hospital.mapper.PatientMapper;
+import com.rabbiter.hospital.pojo.Checks;
 import com.rabbiter.hospital.pojo.Patient;
 import com.rabbiter.hospital.service.PatientService;
-import com.rabbiter.hospital.utils.Md5Util;
+//import com.rabbiter.hospital.utils.Md5Util;
+import com.rabbiter.hospital.utils.HashUtil;
 import com.rabbiter.hospital.utils.TodayUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service("PatientService")
 public class PatientServiceImpl implements PatientService {
@@ -38,7 +44,8 @@ public class PatientServiceImpl implements PatientService {
         if(0 == patient.getPState()) {
             return null;
         }
-        String password = Md5Util.getMD5(pPassword);
+        //String password = Md5Util.getMD5(pPassword);
+        String password = HashUtil.getSHA256(pPassword);
         if ((patient.getPPassword()).equals(password)) {
             return patient;
         }
@@ -100,7 +107,8 @@ public class PatientServiceImpl implements PatientService {
         int yourYear = Integer.parseInt(patient.getPBirthday().substring(0, 4));
         int todayYear = Integer.parseInt(TodayUtil.getTodayYmd().substring(0,4));
         //密码md5加密
-        String password = Md5Util.getMD5(patient.getPPassword());
+        //String password = Md5Util.getMD5(patient.getPPassword());
+        String password = HashUtil.getSHA256(patient.getPPassword());
         patient.setPPassword(password);
         patient.setPAge(todayYear-yourYear);
         patient.setPState(1);
@@ -137,6 +145,57 @@ public class PatientServiceImpl implements PatientService {
     }
 
 
+    /*
+    *更新患者信息
+    * */
+    @Override
+    public Integer updatePatient(Patient patient) {
+        return this.patientMapper.updateById(patient);
     }
+
+    /*
+     * 验证账号邮箱是否一致
+     * */
+    @Override
+    public Boolean diffAccountEmail(Integer pId, String email) {
+        Patient patient = this.patientMapper.selectById(pId);
+        if (patient==null){
+            return false;
+        }
+        Gson gson = new Gson();
+        String json = gson.toJson(patient);
+        // 将JSON字符串转换为Map对象
+        Type type = new TypeToken<Map<String, Object>>() {}.getType();
+        Map<String, Object> patientMap = gson.fromJson(json, type);
+        return patientMap.get("pEmail").equals(email);
+    }
+
+    @Override
+    public Boolean updatePassword(int pId, String newPassword) {
+        Patient patient = this.patientMapper.selectById(pId);
+        if (patient != null) {
+            // 密码加密
+            String password = HashUtil.getSHA256(newPassword);
+
+            // 检查新密码是否与旧密码相同
+            boolean isSamePassword = patient.getPPassword().equals(password);
+            if (isSamePassword) {
+                // 新密码与旧密码相同，无需更新
+                return false;
+            }
+            // 更新患者密码
+            patient.setPPassword(password);
+            int rowsUpdated = this.patientMapper.updateById(patient);
+
+            // 检查更新是否成功
+            return rowsUpdated > 0;
+        } else {
+            // 患者不存在
+            return false;
+        }
+    }
+
+
+}
 
 

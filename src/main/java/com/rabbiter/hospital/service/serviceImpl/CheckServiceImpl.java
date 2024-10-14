@@ -72,4 +72,6 @@ public class CheckServiceImpl implements CheckService {
         System.out.println("影响行数："+i);
         return true;
     }
+
+
 }

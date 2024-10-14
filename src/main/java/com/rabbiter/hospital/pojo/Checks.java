@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Checks {
     @TableId(value = "ch_id")
     @JsonProperty("chId")
-    private int chId;
+    private Integer chId;
     @JsonProperty("chName")
     private String chName;
     @JsonProperty("chPrice")
@@ -17,17 +17,17 @@ public class Checks {
     public Checks() {
     }
 
-    public Checks(int chId, String chName, Double chPrice) {
+    public Checks(Integer chId, String chName, Double chPrice) {
         this.chId = chId;
         this.chName = chName;
         this.chPrice = chPrice;
     }
 
-    public int getChId() {
+    public Integer getChId() {
         return chId;
     }
 
-    public void setChId(int chId) {
+    public void setChId(Integer chId) {
         this.chId = chId;
     }
 

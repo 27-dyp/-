@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Admin {
     @TableId(value = "a_id")
     @JsonProperty("aId")
-    private int aId;
+    private Integer aId;
     @JsonProperty("aPassword")
     private String aPassword;
     @JsonProperty("aName")

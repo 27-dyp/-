@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Patient {
     @TableId(value = "p_id")
     @JsonProperty("pId")
-    private int pId;
+    private Integer pId;
     @JsonProperty("pPassword")
     //@TableField(select = false)
     private String pPassword;
