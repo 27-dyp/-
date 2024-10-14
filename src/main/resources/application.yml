@@ -5,16 +5,15 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/hospital_manager?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     # 线上地址
-    # url: jdbc:mysql://39.101.68.143:3306/hospital_manager?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: root
     password: root
   mail:
     # 发送者邮箱
-    username: 2785290229@qq.com
+    username:******
     #申请到的授权码
-    password: ekwchlcwwewpdcgb
+    password: ************
     # 配置 SMTP 服务器地址
-    host: smtp.qq.com
+    host: *********
     # 端口号465或587
     port: 465
     protocol: smtps
